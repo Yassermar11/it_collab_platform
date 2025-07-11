@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Collab Platform - Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-logo">IT Collab</div>
+    <div class="navbar-actions">
+      <span class="navbar-notifications" title="Notifications">
+        <svg width="24" height="24" fill="none" stroke="#2b79e3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="19" r="2"/><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
+      </span>
+      <div class="navbar-profile">
+        <span class="profile-name" id="navbar-username">Loading... ▼</span>
+        <div class="profile-dropdown">
+          <a href="/auth/logout">Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <aside class="sidebar">
+      <ul>
+        <li class="active"><span>🏠</span> Dashboard</li>
+        <li><span>📁</span> My Projects</li>
+        <li><span>✅</span> Tasks</li>
+        <li><span>📅</span> Calendar</li>
+        <li><span>💬</span> Team Chat</li>
+        <li><span>📄</span> Files/Docs</li>
+        <li><span>⚙️</span> Settings</li>
+      </ul>
+    </aside>
+    <main class="main-content">
+      <h1 id="welcome-user">Welcome!</h1>
+      <div id="user-info" style="margin-bottom: 16px; font-size: 1.1em; color: #2b79e3;"></div>
+      <div class="overview-cards">
+        <div class="card">
+          <h2>Projects</h2>
+          <p id="projects-active">Active: ...</p>
+          <p id="projects-total">Total: ...</p>
+          <p id="projects-notstarted">Not Started: ...</p>
+          <p id="projects-done">Done: ...</p>
+        </div>
+        <div class="card">
+          <h2>Pending Tasks</h2>
+          <p>12 Tasks</p>
+        </div>
+        <div class="card">
+          <h2>Upcoming Meetings</h2>
+          <p>2 Meetings</p>
+        </div>
+      </div>
+      <div class="shortcuts">
+        <button class="shortcut-btn">+ Create New Project</button>
+        <button class="shortcut-btn">+ Add Task</button>
+      </div>
+      <section class="activity-feed">
+        <h2>Recent Activity</h2>
+        <ul>
+          <li>Yasser updated Task X <span class="activity-time">2 min ago</span></li>
+          <li>New file uploaded: <b>ProjectPlan.pdf</b> <span class="activity-time">10 min ago</span></li>
+          <li>Team meeting scheduled <span class="activity-time">1 hour ago</span></li>
+        </ul>
+      </section>
+    </main>
+  </div>
+  <script>
+    // Profile dropdown toggle
+    document.querySelector('.profile-name').addEventListener('click', function() {
+      document.querySelector('.profile-dropdown').classList.toggle('show');
+    });
+    window.addEventListener('click', function(e) {
+      if (!e.target.classList.contains('profile-name')) {
+        document.querySelector('.profile-dropdown').classList.remove('show');
+      }
+    });
+
+    // Fetch user info and section from backend
+    fetch('/api/home')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.username) {
+          document.getElementById('welcome-user').textContent = `Welcome, ${data.username}!`;
+          document.getElementById('navbar-username').textContent = `${data.username} ▼`;
+        }
+        // Show role if available
+        if (data && data.role) {
+          document.getElementById('user-info').textContent = `Role: ${data.role}`;
+        } else {
+          document.getElementById('user-info').textContent = '';
+        }
+        // Show project stats (calculated from backend response)
+        if (data && Array.isArray(data.projects)) {
+          const totalProjects = data.projects.length;
+          const totalActive = data.projects.filter(p => p.status && p.status.toLowerCase() === 'active').length;
+          const totalNotStarted = data.projects.filter(p => p.status && p.status.toLowerCase() === 'not started').length;
+          const totalDone = data.projects.filter(p => p.status && p.status.toLowerCase() === 'done').length;
+          document.getElementById('projects-active').textContent = `Active: ${totalActive}`;
+          document.getElementById('projects-total').textContent = `Total: ${totalProjects}`;
+          document.getElementById('projects-notstarted').textContent = `Not Started: ${totalNotStarted}`;
+          document.getElementById('projects-done').textContent = `Done: ${totalDone}`;
+        } else {
+          // fallback to backend-calculated values if available
+          if (data && typeof data.totalActive !== 'undefined') {
+            document.getElementById('projects-active').textContent = `Active: ${data.totalActive}`;
+          }
+          if (data && typeof data.totalProjects !== 'undefined') {
+            document.getElementById('projects-total').textContent = `Total: ${data.totalProjects}`;
+          }
+          if (data && typeof data.totalNotStarted !== 'undefined') {
+            document.getElementById('projects-notstarted').textContent = `Not Started: ${data.totalNotStarted}`;
+          }
+          if (data && typeof data.totalDone !== 'undefined') {
+            document.getElementById('projects-done').textContent = `Done: ${data.totalDone}`;
+          }
+        }
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+body {
+  background: #f4f7fa;
+  margin: 0;
+  padding: 0;
+}
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(43,121,227,0.08);
+  padding: 1.25rem 2.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2b79e3;
+}
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.navbar-notifications {
+  cursor: pointer;
+  position: relative;
+}
+.navbar-profile {
+  position: relative;
+  cursor: pointer;
+}
+.profile-name {
+  font-weight: 500;
+  color: #333;
+}
+.profile-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 2rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(43,121,227,0.12);
+  border-radius: 8px;
+  min-width: 120px;
+  padding: 0.5rem 0;
+  z-index: 100;
+}
+.profile-dropdown.show {
+  display: block;
+}
+.profile-dropdown a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #2b79e3;
+  text-decoration: none;
+  font-weight: 500;
+}
+.profile-dropdown a:hover {
+  background: #f4f7fa;
+}
+.container {
+  display: flex;
+  min-height: 100vh;
+  gap: 2.5rem;
+}
+.sidebar {
+  background: #fff;
+  min-width: 220px;
+  box-shadow: 2px 0 8px rgba(43,121,227,0.06);
+  padding: 2.5rem 1.5rem;
+  border-radius: 0 16px 16px 0;
+  margin-top: 1.5rem;
+}
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sidebar li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.sidebar li.active, .sidebar li:hover {
+  background: #eaf2fb;
+  color: #2b79e3;
+}
+.main-content {
+  flex: 1;
+  padding: 2.5rem 3rem;
+  margin-top: 1.5rem;
+}
+.main-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #2b79e3;
+}
+.overview-cards {
+  display: flex;
+  gap: 2.5rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+.card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(43,121,227,0.10);
+  padding: 2rem 2.5rem;
+  min-width: 220px;
+  flex: 1;
+  transition: box-shadow 0.2s;
+}
+.card:hover {
+  box-shadow: 0 8px 32px rgba(43,121,227,0.18);
+}
+.card h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  color: #2b79e3;
+}
+.card p {
+  font-size: 1.1rem;
+  color: #333;
+}
+.shortcuts {
+  margin-bottom: 2.5rem;
+  display: flex;
+  gap: 1.5rem;
+}
+.shortcut-btn {
+  background: #2b79e3;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-right: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(43,121,227,0.10);
+  transition: background 0.2s;
+}
+.shortcut-btn:hover {
+  background: #1a5fc1;
+}
+.activity-feed {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(43,121,227,0.08);
+  padding: 2rem 2.5rem;
+  margin-top: 2.5rem;
+}
+.activity-feed h2 {
+  margin-top: 0;
+  color: #2b79e3;
+}
+.activity-feed ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.activity-feed li {
+  padding: 1.1rem 0;
+  border-bottom: 1px solid #eaf2fb;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.activity-feed li:last-child {
+  border-bottom: none;
+}
+.activity-time {
+  color: #888;
+  font-size: 0.95rem;
+}
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+    gap: 0;
+  }
+  .sidebar {
+    min-width: 100%;
+    border-radius: 0 0 16px 16px;
+    box-shadow: none;
+    padding: 1.5rem 1rem;
+    margin-top: 0;
+  }
+  .main-content {
+    padding: 1.5rem 1rem;
+    margin-top: 0;
+  }
+  .overview-cards {
+    gap: 1.2rem;
+  }
+}
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    padding: 1.2rem 1rem;
+  }
+  .container {
+    flex-direction: column;
+    gap: 0;
+  }
+  .sidebar {
+    min-width: 100%;
+    border-radius: 0 0 16px 16px;
+    box-shadow: none;
+    padding: 1rem 0.5rem;
+    margin-top: 0;
+  }
+  .main-content {
+    padding: 1rem 0.5rem;
+    margin-top: 0;
+  }
+  .overview-cards {
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  .card {
+    min-width: 100%;
+    padding: 1.2rem;
+  }
+}
