@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar | IT Collab Platform</title>
+
+    <!-- FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css' rel='stylesheet' />
+    
+    <!-- Font Awesome -->
+    <link href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css' rel='stylesheet' />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/calendar.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/al.css">
+
+    <style>
+        .calendar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .fc {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 10px;
+        }
+
+        .fc-day-today {
+            background-color: #fff0b2 !important;
+            border-color: #ffd700 !important;
+        }
+
+        .fc-day-today .fc-daygrid-day-number {
+            color: #333 !important;
+            font-weight: 600 !important;
+        }
+
+        .fc-event {
+            border-radius: 4px !important;
+            padding: 4px 8px !important;
+            margin: 2px !important;
+            font-size: 12px !important;
+            min-height: 30px !important;
+            cursor: pointer !important;
+            border: none !important;
+        }
+
+        .fc-event-title {
+            display: block !important;
+            margin-bottom: 2px !important;
+            font-weight: 500;
+        }
+
+        .fc-event-status {
+            display: block !important;
+            font-size: 10px !important;
+            opacity: 0.8 !important;
+        }
+
+        .status-badge {
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .status-badge.status-pending {
+            color: #f5a623;
+        }
+
+        .status-badge.status-inprogress {
+            color: #2b79e3;
+        }
+
+        .status-badge.status-completed {
+            color: #27ae60;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-width: 250px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="navbar">
+        <div class="navbar-logo">IT Collab</div>
+        <div class="navbar-actions">
+            <span class="navbar-notifications" title="Notifications">
+                <svg width="24" height="24" fill="none" stroke="#2b79e3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="19" r="2"/>
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+                </svg>
+            </span>
+            <div class="navbar-profile">
+                <span class="profile-name bold-username" id="navbar-username">Loading... ▼</span>
+                <div class="profile-dropdown">
+                    <a href="/auth/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar">
+            <ul>
+                <li><a href="/" style="text-decoration:none;color:inherit;"><span>🏠</span> Dashboard</a></li>
+                <li><a href="/projects" style="text-decoration:none;color:inherit;"><span>📁</span> My Projects</a></li>
+                <li><a href="/tasks" style="text-decoration:none;color:inherit;"><span>✅</span> Tasks</a></li>
+                <li class="active"><a href="/calendar" style="text-decoration:none;color:inherit;"><span>📅</span> Calendar</a></li>
+                <li><a href="/chat" style="text-decoration:none;color:inherit;"><span>💬</span> Team Chat</a></li>
+                <li><span>📄</span> Files/Docs</li>
+                <li><span>⚙️</span> Settings</li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="calendar-container">
+                <div id="calendar"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- FullCalendar Scripts -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.min.js'></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch user info
+            fetch('/api/home')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.username) {
+                        document.getElementById('navbar-username').textContent = `${data.username} ▼`;
+                    }
+                });
+
+            // Initialize calendar
+            const calendarEl = document.getElementById('calendar');
+            
+            if (!calendarEl) {
+                console.error('Calendar element not found');
+                return;
+            }
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'fr',
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'today,prev,next',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                height: 'auto',
+                contentHeight: 'auto',
+                eventTimeFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit'
+                },
+                eventMinHeight: 30,
+                eventMaxStack: 5,
+                eventOverlap: false,
+                events: async function(fetchInfo, successCallback, failureCallback) {
+                    try {
+                        const response = await fetch('/api/tasks');
+                        
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch tasks');
+                        }
+
+                        const tasks = await response.json();
+                        
+                        if (!Array.isArray(tasks)) {
+                            throw new Error('Invalid tasks format');
+                        }
+
+                        const events = tasks.map(task => {
+                            const dueDate = new Date(task.dueDate);
+                            
+                            return {
+                                id: task.id,
+                                title: task.title || 'Untitled',
+                                start: dueDate.toISOString().split('T')[0],
+                                extendedProps: {
+                                    description: task.description || '',
+                                    status: task.status
+                                },
+                                backgroundColor: getColorForStatus(task.status),
+                                borderColor: getColorForStatus(task.status),
+                                display: 'block'
+                            };
+                        });
+                        
+                        successCallback(events);
+                    } catch (error) {
+                        console.error('Error fetching tasks:', error);
+                        failureCallback(error);
+                    }
+                },
+                eventContent: function(arg) {
+                    const statusMap = {
+                        'pending': 'En attente',
+                        'inprogress': 'En cours',
+                        'completed': 'Terminée'
+                    };
+                    
+                    const statusText = statusMap[arg.event.extendedProps.status] || arg.event.extendedProps.status;
+                    const statusColor = getColorForStatus(arg.event.extendedProps.status);
+
+                    return {
+                        domNodes: [
+                            document.createElement('div'),
+                            document.createElement('div')
+                        ].map((el, i) => {
+                            el.className = 'fc-event-main';
+                            el.style.backgroundColor = statusColor;
+                            el.style.borderColor = statusColor;
+                            
+                            if (i === 0) {
+                                el.textContent = arg.event.title;
+                            } else {
+                                el.className = 'fc-event-status';
+                                el.textContent = statusText;
+                            }
+                            
+                            return el;
+                        })
+                    };
+                },
+                eventDidMount: function(info) {
+                    const eventEl = info.el;
+                    const event = info.event;
+                    
+                    // Add tooltip with task details
+                    eventEl.setAttribute('data-tooltip', `
+                        <strong>${event.title}</strong><br>
+                        ${event.extendedProps.description || 'No description'}<br>
+                        Status: ${event.extendedProps.status || 'Not specified'}
+                    `);
+
+                    // Show tooltip on hover
+                    eventEl.addEventListener('mouseenter', () => {
+                        const tooltipEl = document.createElement('div');
+                        tooltipEl.className = 'tooltip';
+                        tooltipEl.innerHTML = eventEl.getAttribute('data-tooltip');
+                        document.body.appendChild(tooltipEl);
+                        
+                        const rect = eventEl.getBoundingClientRect();
+                        tooltipEl.style.position = 'absolute';
+                        tooltipEl.style.left = `${rect.left + window.scrollX}px`;
+                        tooltipEl.style.top = `${rect.bottom + window.scrollY + 5}px`;
+                    });
+                    
+                    eventEl.addEventListener('mouseleave', () => {
+                        const tooltipEl = document.querySelector('.tooltip');
+                        if (tooltipEl) {
+                            tooltipEl.remove();
+                        }
+                    });
+                }
+            });
+
+            // Helper function for status colors
+            function getColorForStatus(status) {
+                const colors = {
+                    'pending': '#f5a623',
+                    'inprogress': '#2b79e3',
+                    'completed': '#27ae60'
+                };
+                return colors[status] || '#666';
+            }
+
+            // Render calendar
+            calendar.render();
+        });
+    </script>
+</body>
+</html>

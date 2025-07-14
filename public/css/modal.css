@@ -1,0 +1,108 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 2rem;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #2b4f81;
+  font-size: 1.5rem;
+}
+
+.modal-close {
+  width: auto;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.8rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #2b4f81;
+  background-color: rgba(43, 79, 129, 0.1);
+  transform: scale(1.1);
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.task-detail-label {
+  font-weight: 500;
+  color: #2b4f81;
+  margin-bottom: 0.5rem;
+}
+
+.task-detail-value {
+  color: #666;
+  line-height: 1.4;
+}
+
+.task-detail-value.status-pending,
+.task-detail-value.status-inprogress,
+.task-detail-value.status-completed {
+  position: relative;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  display: inline-block;
+  z-index: 2;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.task-detail-value.status-pending {
+  color: #f5a623;
+  background-color: rgba(255, 224, 121, 0.95);
+}
+
+.task-detail-value.status-inprogress {
+  color: #1e40af;
+  background-color: #dbeafe;
+}
+
+.task-detail-value.status-completed {
+  color: #166534;
+  background-color: #dcfce7;
+}
+
+.task-detail-description {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}

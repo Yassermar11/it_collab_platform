@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects | IT Collab Platform</title>
+  <link rel="stylesheet" href="/css/al.css">
+
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-logo">IT Collab</div>
+    <div class="navbar-actions">
+      <span class="navbar-notifications" title="Notifications">
+        <svg width="24" height="24" fill="none" stroke="#2b79e3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="19" r="2"/><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
+      </span>
+      <div class="navbar-profile">
+        <span class="profile-name bold-username" id="navbar-username">Loading... ▼</span>
+        <div class="profile-dropdown">
+          <a href="/auth/logout" style="display:block;padding:8px 16px;color:#2b79e3;font-weight:600;text-decoration:none;border-radius:6px;transition:background 0.2s;">Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="/" style="text-decoration:none;color:inherit;"><span>🏠</span> Dashboard</a></li>
+        <li class="active"><a href="/projects" style="text-decoration:none;color:inherit;"><span>📁</span> My Projects</a></li>
+        <li><a href="/tasks" style="text-decoration:none;color:inherit;"><span>✅</span> Tasks</a></li>
+        <li><a href="/calendar" style="text-decoration:none;color:inherit;"><span>📅</span> Calendar</a></li>
+        <li><a href="/chat" style="text-decoration:none;color:inherit;"><span>💬</span> Team Chat</a></li>
+        <li><a href="/files" style="text-decoration:none;color:inherit;"><span>📄</span> Files/Docs</a></li>
+        <li><span>⚙️</span> Settings</li>
+      </ul>
+    </aside>
+    <main class="main-content">
+      <!-- ...existing projects page content... -->
+      <section class="projects-filter">
+        <input type="text" id="search-input" placeholder="Search by project name...">
+        <select id="status-filter">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="not started">Not Started</option>
+          <option value="done">Done</option>
+        </select>
+      </section>
+      <section class="projects-list">
+        <div id="projects-container" class="projects-grid"></div>
+      </section>
+      <!-- Project Details Modal -->
+      <div class="modal" id="project-modal">
+        <div class="modal-content" id="project-modal-content">
+          <span class="close" id="close-project-modal">&times;</span>
+          <div id="project-details"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    // Profile dropdown toggle (same as home page)
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelector('.profile-name').addEventListener('click', function() {
+        document.querySelector('.profile-dropdown').classList.toggle('show');
+      });
+      window.addEventListener('click', function(e) {
+        if (!e.target.classList.contains('profile-name')) {
+          document.querySelector('.profile-dropdown').classList.remove('show');
+        }
+      });
+      // Fetch username for navbar (reuse home logic)
+      fetch('/api/home')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.username) {
+            document.getElementById('navbar-username').textContent = `${data.username} ▼`;
+          }
+        });
+    });
+  </script>
+  <main class="main-content">
+    <section class="projects-filter">
+      <input type="text" id="search-input" placeholder="Search by project name...">
+      <select id="status-filter">
+        <option value="">All Status</option>
+        <option value="active">Active</option>
+        <option value="not started">Not Started</option>
+        <option value="done">Done</option>
+      </select>
+    </section>
+    <section class="projects-list">
+      <div id="projects-container" class="projects-grid"></div>
+    </section>
+    <!-- Project Details Modal -->
+    <div class="modal" id="project-modal">
+      <div class="modal-content" id="project-modal-content">
+        <span class="close" id="close-project-modal">&times;</span>
+        <div id="project-details"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Project Modal -->
+  <div class="modal" id="create-modal">
+    <div class="modal-content">
+      <span class="close" id="close-create-modal">&times;</span>
+      <h2>Create New Project</h2>
+      <form id="create-project-form">
+        <label>Project Title</label>
+        <input type="text" name="title" required>
+        <label>Description</label>
+        <textarea name="description" maxlength="300" required></textarea>
+        <label>Deadline</label>
+        <input type="date" name="deadline" required>
+        <label>Status</label>
+        <select name="status" required>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+          <option value="On Hold">On Hold</option>
+        </select>
+        <label>Team Members</label>
+        <div class="team-members-list">
+          <label><input type="checkbox" name="team" value="Yasser"> Yasser</label>
+          <label><input type="checkbox" name="team" value="Sara"> Sara</label>
+          <label><input type="checkbox" name="team" value="Ali"> Ali</label>
+          <label><input type="checkbox" name="team" value="Lina"> Lina</label>
+        </div>
+        <button type="submit" class="create-btn">Create Project</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/projects.js"></script>
+</body>
+</html>

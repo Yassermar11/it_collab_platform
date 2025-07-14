@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat | IT Collab Platform</title>
+    
+    <!-- Font Awesome -->
+    <link href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css' rel='stylesheet' />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/al.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            height: 100vh;
+            background: #f0f2f5;
+        }
+
+        .chat-sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #ddd;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dfe3e8;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .username {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .users-list {
+            width: 80px;
+            background: #f8f9fa;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 5px;
+            gap: 12px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .conversation-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dfe3e8;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .user-details h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .last-message {
+            margin: 0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 80%;
+            margin: 10px;
+            padding: 12px 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: flex-start;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .message.sent {
+            margin-left: auto;
+            background: #0084ff;
+            color: white;
+        }
+
+        .message-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+        }
+
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            background: white;
+            position: sticky;
+            bottom: 0;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #messageInput {
+            flex: 1;
+            min-width: 0;
+            padding: 12px;
+            border: 2px solid #a6a6a6;
+            border-radius: 12px;
+            resize: none;
+            font-size: 14px;
+            min-height: 40px;
+            max-height: 100px;
+            overflow-y: auto;
+            background: white;
+        }
+
+        #messageInput:focus {
+            outline: none;
+            border-color: #000000;
+        }
+
+        .send-button, .attachment-btn {
+            padding: 12px;
+            background: #0084ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            width: 50px;
+            height: 50px;
+        }
+
+        .send-button:hover, .attachment-btn:hover {
+            background: #0066cc;
+        }
+
+        @media (max-width: 768px) {
+            .chat-input {
+                padding: 10px;
+            }
+            
+            .input-wrapper {
+                gap: 5px;
+            }
+            
+            .send-button, .attachment-btn {
+                padding: 10px;
+                min-width: 35px;
+            }
+            
+            #messageInput {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .chat-input {
+                padding: 8px;
+            }
+            
+            .input-wrapper {
+                gap: 4px;
+            }
+            
+            .send-button, .attachment-btn {
+                padding: 8px;
+                min-width: 30px;
+            }
+            
+            #messageInput {
+                padding: 8px;
+                font-size: 12px;
+            }
+        }
+
+        .user-avatar {
+            margin-bottom: 8px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dfe3e8;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .avatar-container {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #dfe3e8;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">IT Collab</div>
+        <div class="navbar-actions">
+          <span class="navbar-notifications" title="Notifications">
+            <svg width="24" height="24" fill="none" stroke="#2b79e3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="19" r="2"/><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
+          </span>
+          <div class="navbar-profile">
+            <span class="profile-name bold-username" id="navbar-username">Loading... ▼</span>
+            <div class="profile-dropdown">
+              <a href="/auth/logout">Logout</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    <div class="container">
+        <aside class="sidebar">
+            <ul>
+              <li><a href="/" style="text-decoration:none;color:inherit;"><span>🏠</span> Dashboard</a></li>
+              <li><a href="/projects" style="text-decoration:none;color:inherit;"><span>📁</span> My Projects</a></li>
+              <li><a href="/tasks" style="text-decoration:none;color:inherit;"><span>✅</span> Tasks</a></li>
+              <li><a href="/calendar" style="text-decoration:none;color:inherit;"><span>📅</span> Calendar</a></li>
+              <li class="active"><a href="/chat" style="text-decoration:none;color:inherit;"><span>💬</span> Team Chat</a></li>
+              <li><span>📄</span> Files/Docs</li>
+              <li><span>⚙️</span> Settings</li>
+            </ul>
+        </aside>
+        
+        <div class="chat-container">
+            <div class="chat-sidebar">
+                <div class="chat-header">
+                    <h2>Messages</h2>
+                </div>
+                <div class="users-list" id="usersList">
+                    <!-- Users will be added here by JavaScript -->
+                </div>
+            </div>
+            <div class="chat-main">
+                <div class="conversation-header">
+                    <div class="user-info">
+                        <div class="user-avatar" id="currentChatAvatar"></div>
+                        <div class="user-details">
+                            <h3 id="currentChatUsername">Select a user to chat</h3>
+                            <p class="last-message">No messages yet</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-messages">
+                    <!-- Messages will be added here by JavaScript -->
+                </div>
+                <div class="chat-input">
+                    <div class="input-wrapper">
+                        <textarea id="messageInput" placeholder="Type a message..." rows="2"></textarea>
+                        <button id="sendButton" class="send-button">
+                            <i class="material-icons">send</i>
+                        </button>
+                        
+                        <button class="attachment-btn">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="/js/al.js"></script>
+<script src="/js/chat.js"></script>
+</html>

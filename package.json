@@ -6,15 +6,25 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "connect-flash": "^0.1.1",
+    "connect-session-sequelize": "^8.0.1",
     "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
     "debug": "~2.6.9",
     "dotenv": "^17.2.0",
+    "ejs": "^3.1.10",
     "express": "~4.16.1",
+    "express-mysql-session": "^3.0.3",
+    "express-session": "^1.18.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "~1.9.1",
     "mysql2": "^3.14.2",
-    "sequelize": "^6.37.7"
+    "passport": "^0.7.0",
+    "sequelize": "^6.37.7",
+    "socket.io": "^4.8.1"
   }
 }

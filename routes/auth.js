@@ -1,76 +1,92 @@
 const express = require('express');
-require('dotenv').config();
 const router = express.Router();
-const { Sequelize, DataTypes } = require('sequelize');
-const jwt = require('jsonwebtoken');
-const sequelize = require('../config/db');
-
-// GET /auth/logout
-router.get('/auth/logout', (req, res) => {
-  res.clearCookie('token');
-  res.redirect('/login');
-});
-
-const User = sequelize.define('User', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: Sequelize.NOW,
-  },
-  role: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  tableName: 'users',
-  timestamps: false,
-});
+const bcrypt = require('bcryptjs');
+const { User } = require('../models');
 
 // POST /auth/login
-router.post('/auth/login', (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password required.' });
-  }
-  User.findOne({ where: { email } })
-    .then(user => {
-      if (!user) {
-        return res.status(401).json({ message: 'Invalid email or password.' });
-      }
-      if (user.password !== password) {
-        return res.status(401).json({ message: 'Invalid email or password.' });
-      }
-      // Generate JWT token with user info (add role if available)
-      const token = jwt.sign({ id: user.id, email: user.email, name: user.username, role: user.role || 'user' }, process.env.JWT_SECRET, { expiresIn: '2h' });
-      // If browser, set cookie and redirect
-      if (req.accepts('html')) {
-        res.cookie('token', token, { httpOnly: true, maxAge: 2 * 60 * 60 * 1000 });
-        return res.redirect('/home');
-      }
-      // For API, send token and user info in response
-      res.json({ message: 'Login successful', token, user: { id: user.id, name: user.name, email: user.email, role: user.role || 'user', created_at: user.created_at } });
-    })
-    .catch(err => {
-      console.error('Login DB error:', err);
-      res.status(500).json({ message: 'Database error.', error: err.message });
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Email and password are required.' 
+      });
+    }
+
+    const user = await User.findOne({ where: { email } });
+    
+    if (!user) {
+      return res.status(401).json({ 
+        success: false,
+        message: 'Invalid email or password' 
+      });
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ 
+        success: false,
+        message: 'Invalid email or password' 
+      });
+    }
+
+    // Store session data
+    req.session.userId = user.id;
+    req.session.username = user.username;
+    
+    // Save session and handle errors
+    try {
+      await new Promise((resolve, reject) => {
+        req.session.save(err => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
+      res.redirect('/home');
+    } catch (err) {
+      console.error('Error saving session:', err);
+      // Clear the session on error
+      req.session.destroy(() => {
+        res.status(500).json({
+          success: false,
+          message: 'Error saving session'
+        });
+      });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Internal server error' 
     });
+  }
 });
+
+// Handle logout for both GET and POST requests
+router.get('/logout', (req, res) => {
+  // Clear the session
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+    }
+    res.redirect('/login');
+  });
+});
+
+router.post('/logout', (req, res) => {
+  // Clear the session
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      return res.status(500).json({ message: 'Error logging out' });
+    }
+    res.json({ message: 'Logged out successfully' });
+  });
+});
+
+
 
 module.exports = router;

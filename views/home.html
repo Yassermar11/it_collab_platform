@@ -6,6 +6,7 @@
   <title>IT Collab Platform - Dashboard</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/home.css">
+  <link rel="stylesheet" href="/css/al.css">
 </head>
 <body>
   <nav class="navbar">
@@ -15,7 +16,7 @@
         <svg width="24" height="24" fill="none" stroke="#2b79e3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="19" r="2"/><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
       </span>
       <div class="navbar-profile">
-        <span class="profile-name" id="navbar-username">Loading... ▼</span>
+        <span class="profile-name bold-username" id="navbar-username">Loading... ▼</span>
         <div class="profile-dropdown">
           <a href="/auth/logout">Logout</a>
         </div>
@@ -25,11 +26,11 @@
   <div class="container">
     <aside class="sidebar">
       <ul>
-        <li class="active"><span>🏠</span> Dashboard</li>
-        <li><span>📁</span> My Projects</li>
-        <li><span>✅</span> Tasks</li>
-        <li><span>📅</span> Calendar</li>
-        <li><span>💬</span> Team Chat</li>
+        <li class="active"><a href="/" style="text-decoration:none;color:inherit;"><span>🏠</span> Dashboard</a></li>
+        <li><a href="/projects" style="text-decoration:none;color:inherit;"><span>📁</span> My Projects</a></li>
+        <li><a href="/tasks" style="text-decoration:none;color:inherit;"><span>✅</span> Tasks</a></li>
+        <li><a href="/calendar" style="text-decoration:none;color:inherit;"><span>📅</span> Calendar</a></li>
+        <li><a href="/chat" style="text-decoration:none;color:inherit;"><span>💬</span> Team Chat</a></li>
         <li><span>📄</span> Files/Docs</li>
         <li><span>⚙️</span> Settings</li>
       </ul>
@@ -46,8 +47,9 @@
           <p id="projects-done">Done: ...</p>
         </div>
         <div class="card">
-          <h2>Pending Tasks</h2>
-          <p>12 Tasks</p>
+          <h2>Tasks</h2>
+          <p id="tasks-pending">Pending: ...</p>
+          <p id="tasks-completed">Completed: ...</p>
         </div>
         <div class="card">
           <h2>Upcoming Meetings</h2>
@@ -79,46 +81,64 @@
       }
     });
 
-    // Fetch user info and section from backend
-    fetch('/api/home')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.username) {
-          document.getElementById('welcome-user').textContent = `Welcome, ${data.username}!`;
-          document.getElementById('navbar-username').textContent = `${data.username} ▼`;
+    async function updateDashboard(data) {
+      if (!data || !data.user) {
+        console.error('Invalid data received:', data);
+        return;
+      }
+
+      document.getElementById('welcome-user').textContent = `Welcome, ${data.user.username}!`;
+      document.getElementById('user-info').textContent = `Role: ${data.user.role}`;
+      
+      // Projects
+      const totalProjects = data.projects.length;
+      const totalActive = data.projects.filter(p => p.status && p.status.toLowerCase() === 'active').length;
+      const totalNotStarted = data.projects.filter(p => p.status && p.status.toLowerCase() === 'not started').length;
+      const totalDone = data.projects.filter(p => p.status && p.status.toLowerCase() === 'done').length;
+      document.getElementById('projects-active').textContent = `Active: ${totalActive}`;
+      document.getElementById('projects-total').textContent = `Total: ${totalProjects}`;
+      document.getElementById('projects-notstarted').textContent = `Not Started: ${totalNotStarted}`;
+      document.getElementById('projects-done').textContent = `Done: ${totalDone}`;
+      
+      // Display recent messages
+      const messagesContainer = document.getElementById('recent-messages');
+      if (messagesContainer) {
+        messagesContainer.innerHTML = data.messages.map(msg => `
+          <div class="message-item">
+            <span class="message-sender">${msg.sender.username}</span>
+            <span class="message-content">${msg.content}</span>
+            <span class="message-time">${new Date(msg.created_at).toLocaleString()}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    async function fetchDashboard() {
+      try {
+        const response = await fetch('/api/home', {
+          credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch dashboard data');
         }
-        // Show role if available
-        if (data && data.role) {
-          document.getElementById('user-info').textContent = `Role: ${data.role}`;
-        } else {
-          document.getElementById('user-info').textContent = '';
+
+        const data = await response.json();
+        if (data && data.user) {
+          document.getElementById('welcome-user').textContent = `Welcome, ${data.user.username}!`;
+          document.getElementById('navbar-username').textContent = `${data.user.username} ▼`;
+          document.getElementById('user-info').textContent = `Role: ${data.user.role}`;
         }
-        // Show project stats (calculated from backend response)
-        if (data && Array.isArray(data.projects)) {
-          const totalProjects = data.projects.length;
-          const totalActive = data.projects.filter(p => p.status && p.status.toLowerCase() === 'active').length;
-          const totalNotStarted = data.projects.filter(p => p.status && p.status.toLowerCase() === 'not started').length;
-          const totalDone = data.projects.filter(p => p.status && p.status.toLowerCase() === 'done').length;
-          document.getElementById('projects-active').textContent = `Active: ${totalActive}`;
-          document.getElementById('projects-total').textContent = `Total: ${totalProjects}`;
-          document.getElementById('projects-notstarted').textContent = `Not Started: ${totalNotStarted}`;
-          document.getElementById('projects-done').textContent = `Done: ${totalDone}`;
-        } else {
-          // fallback to backend-calculated values if available
-          if (data && typeof data.totalActive !== 'undefined') {
-            document.getElementById('projects-active').textContent = `Active: ${data.totalActive}`;
-          }
-          if (data && typeof data.totalProjects !== 'undefined') {
-            document.getElementById('projects-total').textContent = `Total: ${data.totalProjects}`;
-          }
-          if (data && typeof data.totalNotStarted !== 'undefined') {
-            document.getElementById('projects-notstarted').textContent = `Not Started: ${data.totalNotStarted}`;
-          }
-          if (data && typeof data.totalDone !== 'undefined') {
-            document.getElementById('projects-done').textContent = `Done: ${data.totalDone}`;
-          }
-        }
-      });
+        updateDashboard(data);
+      } catch (error) {
+        console.error('Error fetching dashboard:', error);
+        // Redirect to login if authentication fails
+        window.location.href = '/login';
+      }
+    }
+
+    // Initial fetch
+    fetchDashboard();
   </script>
 </body>
 </html>
