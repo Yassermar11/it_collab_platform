@@ -53,10 +53,27 @@ router.get('/api/home', authMiddleware, async (req, res) => {
             return [];
         });
 
+        // Get user's tasks
+        const tasks = await Task.findAll({
+            where: {
+                assigned_to: user.id
+            },
+            attributes: ['id', 'name', 'status', 'due_date', 'created_at']
+        });
+
+        // Calculate task statistics
+        const taskStats = {
+            total: tasks.length,
+            pending: tasks.filter(t => t.status === 'pending').length,
+            in_progress: tasks.filter(t => t.status === 'in_progress').length,
+            completed: tasks.filter(t => t.status === 'completed').length
+        };
+
         res.json({
             user: userData,
             projects,
-            messages
+            messages,
+            tasks: taskStats
         });
     } catch (err) {
         console.error('API /api/home error:', err);

@@ -48,7 +48,9 @@
         </div>
         <div class="card">
           <h2>Tasks</h2>
+          <p id="tasks-total">Total: ...</p>
           <p id="tasks-pending">Pending: ...</p>
+          <p id="tasks-in-progress">In Progress: ...</p>
           <p id="tasks-completed">Completed: ...</p>
         </div>
         <div class="card">
@@ -90,16 +92,22 @@
       document.getElementById('welcome-user').textContent = `Welcome, ${data.user.username}!`;
       document.getElementById('user-info').textContent = `Role: ${data.user.role}`;
       
-      // Projects
-      const totalProjects = data.projects.length;
-      const totalActive = data.projects.filter(p => p.status && p.status.toLowerCase() === 'active').length;
-      const totalNotStarted = data.projects.filter(p => p.status && p.status.toLowerCase() === 'not started').length;
-      const totalDone = data.projects.filter(p => p.status && p.status.toLowerCase() === 'done').length;
-      document.getElementById('projects-active').textContent = `Active: ${totalActive}`;
-      document.getElementById('projects-total').textContent = `Total: ${totalProjects}`;
-      document.getElementById('projects-notstarted').textContent = `Not Started: ${totalNotStarted}`;
-      document.getElementById('projects-done').textContent = `Done: ${totalDone}`;
-      
+      // Update project stats
+      if (data && data.projects) {
+        document.getElementById('projects-active').textContent = `Active: ${data.projects.filter(p => p.status === 'active').length}`;
+        document.getElementById('projects-total').textContent = `Total: ${data.projects.length}`;
+        document.getElementById('projects-notstarted').textContent = `Not Started: ${data.projects.filter(p => p.status === 'not_started').length}`;
+        document.getElementById('projects-done').textContent = `Done: ${data.projects.filter(p => p.status === 'done').length}`;
+      }
+
+      // Update task stats
+      if (data && data.tasks) {
+        document.getElementById('tasks-total').textContent = `Total: ${data.tasks.total}`;
+        document.getElementById('tasks-pending').textContent = `Pending: ${data.tasks.pending}`;
+        document.getElementById('tasks-in-progress').textContent = `In Progress: ${data.tasks.in_progress}`;
+        document.getElementById('tasks-completed').textContent = `Completed: ${data.tasks.completed}`;
+      }
+
       // Display recent messages
       const messagesContainer = document.getElementById('recent-messages');
       if (messagesContainer) {
