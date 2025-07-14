@@ -90,7 +90,6 @@
       }
 
       document.getElementById('welcome-user').textContent = `Welcome, ${data.user.username}!`;
-      document.getElementById('user-info').textContent = `Role: ${data.user.role}`;
       
       // Update project stats
       if (data && data.projects) {
@@ -133,9 +132,9 @@
 
         const data = await response.json();
         if (data && data.user) {
-          document.getElementById('welcome-user').textContent = `Welcome, ${data.user.username}!`;
-          document.getElementById('navbar-username').textContent = `${data.user.username} ▼`;
-          document.getElementById('user-info').textContent = `Role: ${data.user.role}`;
+          const usernameWithRole = `${data.user.username} (${data.user.role})`;
+          document.getElementById('welcome-user').textContent = `Welcome, ${usernameWithRole}!`;
+          document.getElementById('navbar-username').textContent = `${usernameWithRole} ▼`;
         }
         updateDashboard(data);
       } catch (error) {
