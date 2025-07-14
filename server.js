@@ -43,30 +43,25 @@ const sessionStore = new MySQLStore({
             }
         }
     },
-    // Use Unix timestamp for expiration
     expires: 86400000, // 24 hours in milliseconds
-    touchAfter: 24 * 3600,
+    touchAfter: 24 * 3600, // 24 hours
     clearExpired: true,
-    cleanup: true,
-    // Custom session save function to handle Unix timestamp
-    save: function(session, callback) {
-        const expires = Math.floor(Date.now() / 1000) + Math.floor(this.expiration / 1000);
-        const data = JSON.stringify(session);
-        
-        this.query(
-            'REPLACE INTO ?? (??, ??, ??) VALUES (?, ?, ?)',
-            [this.schema.tableName,
-             this.schema.columnNames.session_id,
-             this.schema.columnNames.expires,
-             this.schema.columnNames.data,
-             session.id,
-             expires,
-             data
-            ],
-            callback
-        );
-    }
+    cleanup: true
 });
+
+// Configure Express session
+app.use(session({
+    store: sessionStore,
+    secret: process.env.SESSION_SECRET || 'your-session-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 86400000, // 24 hours in milliseconds
+        sameSite: 'lax'
+    }
+}));
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-session-secret',

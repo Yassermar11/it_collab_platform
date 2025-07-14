@@ -36,15 +36,22 @@ router.post('/login', async (req, res) => {
     // Store session data
     req.session.userId = user.id;
     req.session.username = user.username;
+    req.session.role = user.role;
     
     // Save session and handle errors
     try {
       await new Promise((resolve, reject) => {
         req.session.save(err => {
-          if (err) return reject(err);
+          if (err) {
+            console.error('Error saving session:', err);
+            reject(err);
+            return;
+          }
           resolve();
         });
       });
+      
+      // Redirect to home after successful login
       res.redirect('/home');
     } catch (err) {
       console.error('Error saving session:', err);
