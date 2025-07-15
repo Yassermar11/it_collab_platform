@@ -293,6 +293,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Fetch users every 30 seconds to keep the list updated
-    setInterval(fetchUsers, 30000);
+
 });
