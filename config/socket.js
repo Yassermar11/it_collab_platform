@@ -54,11 +54,11 @@ io.on('connection', async (socket) => {
   socket.on('new-message', async (data) => {
     try {
       const { content, chatRoomId, attachment } = data;
-      const senderId = activeConnections.get(socket.id);
+      const sender_id = activeConnections.get(socket.id);
 
       const message = await Message.create({
         content,
-        senderId,
+        sender_id,
         chatRoomId,
         attachment
       });
@@ -66,7 +66,7 @@ io.on('connection', async (socket) => {
       // Broadcast to all users in the chat room
       io.to(chatRoomId.toString()).emit('new-message', {
         ...message.toJSON(),
-        sender: await User.findByPk(senderId)
+        sender: await User.findByPk(sender_id)
       });
     } catch (error) {
       socket.emit('error', error.message);
@@ -88,7 +88,7 @@ io.on('connection', async (socket) => {
   // Handle private chat requests
   socket.on('request-private-chat', async (userId) => {
     try {
-      const senderId = activeConnections.get(socket.id);
+      const sender_id = activeConnections.get(socket.id);
       
       // Check if chat room already exists
       const existingRoom = await ChatRoom.findOne({
@@ -96,7 +96,7 @@ io.on('connection', async (socket) => {
           type: 'private',
           isGroup: false,
           ChatRoomParticipants: {
-            userId: { [Op.in]: [senderId, userId] }
+            userId: { [Op.in]: [sender_id, userId] }
           }
         },
         include: ChatRoomParticipants
@@ -109,7 +109,7 @@ io.on('connection', async (socket) => {
 
       // Create new chat room
       const chatRoom = await ChatRoom.create({
-        name: `Private chat between ${senderId} and ${userId}`,
+        name: `Private chat between ${sender_id} and ${userId}`,
         type: 'private'
       });
 
@@ -117,7 +117,7 @@ io.on('connection', async (socket) => {
       await Promise.all([
         ChatRoomParticipants.create({
           chatRoomId: chatRoom.id,
-          userId: senderId
+          userId: sender_id
         }),
         ChatRoomParticipants.create({
           chatRoomId: chatRoom.id,

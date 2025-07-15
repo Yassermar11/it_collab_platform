@@ -148,8 +148,8 @@ INSERT INTO `users` (`id`, `email`, `password`, `created_at`, `username`, `role`
 --
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `senderId` (`sender_id`),
-  ADD KEY `receiverId` (`receiver_id`);
+  ADD KEY `sender_id` (`sender_id`),
+  ADD KEY `receiver_id` (`receiver_id`);
 
 --
 -- Index pour la table `projects`

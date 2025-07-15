@@ -56,26 +56,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 avatar.textContent = user.username.charAt(0).toUpperCase();
                 avatar.title = user.username;
                 
-                // Create username text
-                const username = document.createElement('span');
-                username.className = 'username';
-                username.textContent = user.username;
+                // Create status indicator
+                const status = document.createElement('div');
+                status.className = `user-status ${user.isOnline ? 'online' : ''}`;
+                
+                // Create user info
+                const userInfo = document.createElement('div');
+                userInfo.className = 'user-info';
+                
+                const userName = document.createElement('span');
+                userName.className = 'user-name';
+                userName.textContent = user.username;
+                
+                const userRole = document.createElement('span');
+                userRole.className = 'user-role';
+                userRole.textContent = "Role: " + user.role;
+                
+                userInfo.appendChild(userName);
+                userInfo.appendChild(userRole);
                 
                 // Combine elements
                 userElement.appendChild(avatar);
-                userElement.appendChild(username);
+                userElement.appendChild(status);
+                userElement.appendChild(userInfo);
                 
                 // Add event listeners
-                userElement.addEventListener('mouseenter', () => {
-                    userElement.style.transform = 'scale(1.05)';
-                    userElement.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-                });
-
-                userElement.addEventListener('mouseleave', () => {
-                    userElement.style.transform = 'scale(1)';
-                    userElement.style.boxShadow = 'none';
-                });
-
                 userElement.addEventListener('click', () => selectUser(user));
                 
                 usersContainer.appendChild(userElement);
@@ -85,8 +90,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Add search functionality
+    const userSearch = document.getElementById('userSearch');
+    if (userSearch) {
+        userSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const userItems = document.querySelectorAll('.user-item');
+            
+            userItems.forEach(item => {
+                const username = item.dataset.username.toLowerCase();
+                const role = item.querySelector('.user-role').textContent.toLowerCase();
+                const shouldShow = username.includes(searchTerm) || role.includes(searchTerm);
+                item.style.display = shouldShow ? 'flex' : 'none';
+            });
+        });
+    }
+
     // Initialize chat when the page loads
     fetchUsers();
+
+    // Add event listener for group chat button
+    const startGroupChat = document.getElementById('startGroupChat');
+    if (startGroupChat) {
+        startGroupChat.addEventListener('click', () => {
+            // TODO: Implement group chat functionality
+            alert('Group chat coming soon!');
+        });
+    }
 
     // Fetch messages for a specific user
     function fetchMessages(userId) {
@@ -114,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 messages.forEach(message => {
                     // Validate required fields
-                    if (!message || typeof message !== 'object' || !message.content || !message.senderId) {
+                    if (!message || typeof message !== 'object' || !message.content || !message.sender_id) {
                         console.error('Invalid message:', message);
                         return;
                     }
@@ -127,8 +157,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     const messageDiv = document.createElement('div');
-                    // Compare senderId with current user's ID
-                    messageDiv.className = `message ${message.senderId === userId ? 'received' : 'sent'}`;
+                    // Compare sender_id with current user's ID
+                    messageDiv.className = `message ${message.sender_id === userId ? 'received' : 'sent'}`;
                     
                     // Format the date
                     try {
@@ -209,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    receiverId: currentChatUser.id,
+                    receiver_id: currentChatUser.id,
                     content
                 })
             })

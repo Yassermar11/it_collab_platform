@@ -5,15 +5,18 @@ const Message = (sequelize) => {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true
+            autoIncrement: true,
+            field: 'id'
         },
         content: {
             type: DataTypes.TEXT,
-            allowNull: false
+            allowNull: false,
+            field: 'content'
         },
         sender_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            field: 'sender_id',
             references: {
                 model: 'users',
                 key: 'id'
@@ -22,14 +25,16 @@ const Message = (sequelize) => {
         receiver_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            field: 'receiver_id',
             references: {
                 model: 'users',
                 key: 'id'
             }
         },
-        is_read: {
+        isRead: {
             type: DataTypes.BOOLEAN,
-            defaultValue: false
+            defaultValue: false,
+            field: 'is_read'
         }
     }, {
         tableName: 'messages',
@@ -42,11 +47,13 @@ const Message = (sequelize) => {
     MessageModel.associate = (models) => {
         MessageModel.belongsTo(models.User, {
             foreignKey: 'sender_id',
-            as: 'sender'
+            as: 'sender',
+            constraints: false
         });
         MessageModel.belongsTo(models.User, {
             foreignKey: 'receiver_id',
-            as: 'receiver'
+            as: 'receiver',
+            constraints: false
         });
     };
 
