@@ -8,12 +8,13 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    // Fetch username for navbar (reuse home logic)
+    // Fetch username and role for navbar
     fetch('/api/home')
       .then(res => res.json())
       .then(data => {
-        if (data && data.username) {
-          document.getElementById('navbar-username').textContent = `${data.username} ▼`;
+        if (data && data.user) {
+          const usernameWithRole = `${data.user.username} (${data.user.role})`;
+          document.getElementById('navbar-username').textContent = `${usernameWithRole} ▼`;
         }
       });
   });
