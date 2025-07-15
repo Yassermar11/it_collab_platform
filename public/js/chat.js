@@ -183,16 +183,34 @@ document.addEventListener('DOMContentLoaded', function() {
                             return;
                         }
                         
+                        // Get today's date
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        
+                        // Create date object for the message
+                        const messageDate = new Date(date);
+                        messageDate.setHours(0, 0, 0, 0);
+                        
+                        // Format the time and date
                         const timeString = date.toLocaleTimeString('en-US', {
                             hour: '2-digit',
                             minute: '2-digit',
                             hour12: false
                         });
                         
+                        let dateString = '';
+                        if (messageDate.getTime() !== today.getTime()) {
+                            dateString = date.toLocaleDateString('fr-FR', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                        }
+                        
                         messageDiv.innerHTML = `
                             <div class="message-content">
                                 <span class="message-text">${message.content}</span>
-                                <span class="message-time">${timeString}</span>
+                                <span class="message-time">${dateString ? `${dateString} - ${timeString}` : timeString}</span>
                             </div>
                         `;
                         messagesContainer.appendChild(messageDiv);
