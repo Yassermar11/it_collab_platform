@@ -41,26 +41,22 @@
       <div class="overview-cards">
         <div class="card">
           <h2>Projects</h2>
-          <p id="projects-active">Active: ...</p>
-          <p id="projects-total">Total: ...</p>
-          <p id="projects-notstarted">Not Started: ...</p>
-          <p id="projects-done">Done: ...</p>
+          <p id="projects-active" class="status-active">Active: ...</p>
+          <p id="projects-notstarted" class="status-not-started">Not Started: ...</p>
+          <p id="projects-done" class="status-done">Done: ...</p>
+          <p id="projects-total" class="status-total">Total: ...</p>
         </div>
         <div class="card">
           <h2>Tasks</h2>
-          <p id="tasks-total">Total: ...</p>
-          <p id="tasks-pending">Pending: ...</p>
-          <p id="tasks-in-progress">In Progress: ...</p>
-          <p id="tasks-completed">Completed: ...</p>
+          <p id="tasks-in-progress" class="status-active">In Progress: ...</p>
+          <p id="tasks-pending" class="status-not-started">Pending: ...</p>
+          <p id="tasks-completed" class="status-done">Completed: ...</p>
+          <p id="tasks-total" class="status-total">Total: ...</p>
         </div>
         <div class="card">
           <h2>Upcoming Meetings</h2>
           <p>2 Meetings</p>
         </div>
-      </div>
-      <div class="shortcuts">
-        <button class="shortcut-btn">+ Create New Project</button>
-        <button class="shortcut-btn">+ Add Task</button>
       </div>
       <section class="activity-feed">
         <h2>Recent Activity</h2>
@@ -70,6 +66,65 @@
           <li>Team meeting scheduled <span class="activity-time">1 hour ago</span></li>
         </ul>
       </section>
+      <style>
+        .status-active {
+          background-color: #fdefaa;
+          padding: 5px 10px;
+          border-radius: 4px;
+          color: #007bff;
+        }
+
+        .status-not-started {
+          background-color: #ff9999;
+          padding: 5px 10px;
+          border-radius: 4px;
+          color: #c31d00;
+        }
+
+        .status-done {
+          background-color: #aaffbe;
+          padding: 5px 10px;
+          border-radius: 4px;
+          color: #155724;
+        }
+
+        .status-total {
+          background-color: #9bd4ff;
+          padding: 5px 10px;
+          border-radius: 4px;
+          color: #007bff;
+        }
+
+        .overview-cards {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 20px;
+          padding: 20px;
+        }
+
+        .card {
+          background: white;
+          border-radius: 8px;
+          padding: 20px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-5px);
+        }
+
+        .card h2 {
+          margin-top: 0;
+          color: #333;
+          font-size: 1.2em;
+        }
+
+        .card p {
+          margin: 10px 0;
+          font-size: 1.1em;
+        }
+      </style>
     </main>
   </div>
   <script>
@@ -93,10 +148,10 @@
       
       // Update project stats
       if (data && data.projects) {
-        document.getElementById('projects-active').textContent = `Active: ${data.projects.filter(p => p.status === 'active').length}`;
-        document.getElementById('projects-total').textContent = `Total: ${data.projects.length}`;
-        document.getElementById('projects-notstarted').textContent = `Not Started: ${data.projects.filter(p => p.status === 'not_started').length}`;
-        document.getElementById('projects-done').textContent = `Done: ${data.projects.filter(p => p.status === 'done').length}`;
+        document.getElementById('projects-active').textContent = `Active: ${data.projects.active}`;
+        document.getElementById('projects-total').textContent = `Total: ${data.projects.total}`;
+        document.getElementById('projects-notstarted').textContent = `Not Started: ${data.projects.notStarted}`;
+        document.getElementById('projects-done').textContent = `Done: ${data.projects.done}`;
       }
 
       // Update task stats

@@ -69,12 +69,38 @@ router.get('/api/home', authMiddleware, async (req, res) => {
             completed: tasks.filter(t => t.status === 'completed').length
         };
 
-        res.json({
-            user: userData,
-            projects,
-            messages,
-            tasks: taskStats
-        });
+        // Update project stats
+        if (projects && projects.length > 0) {
+            // Convert status to lowercase for case-insensitive comparison
+            const projectStats = projects.map(p => ({
+                ...p,
+                status: p.status.toLowerCase()
+            }));
+
+            const activeProjects = projectStats.filter(p => p.status === 'active').length;
+            const totalProjects = projectStats.length;
+            const notStartedProjects = projectStats.filter(p => p.status === 'not started').length;
+            const doneProjects = projectStats.filter(p => p.status === 'done').length;
+
+            res.json({
+                user: userData,
+                projects: {
+                    active: activeProjects,
+                    total: totalProjects,
+                    notStarted: notStartedProjects,
+                    done: doneProjects
+                },
+                messages,
+                tasks: taskStats
+            });
+        } else {
+            res.json({
+                user: userData,
+                projects: {},
+                messages,
+                tasks: taskStats
+            });
+        }
     } catch (err) {
         console.error('API /api/home error:', err);
         res.status(500).json({ message: 'Database error.' });
