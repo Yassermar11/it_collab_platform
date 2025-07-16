@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meetings | IT Collab Platform</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/al.css">
+    <link rel="stylesheet" href="/css/meetings.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">IT Collab</div>
+        <div class="navbar-actions">
+            <span class="navbar-notifications" title="Notifications">
+                <svg width="24" height="24" fill="none" stroke="#2b79e3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="19" r="2"/><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
+            </span>
+            <div class="navbar-profile">
+                <span class="profile-name bold-username" id="navbar-username">Loading... ▼</span>
+                <div class="profile-dropdown">
+                    <a href="/auth/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar">
+            <ul>
+                <li><a href="/" style="text-decoration:none;color:inherit;"><span>🏠</span> Dashboard</a></li>
+                <li><a href="/projects" style="text-decoration:none;color:inherit;"><span>📁</span> My Projects</a></li>
+                <li><a href="/tasks" style="text-decoration:none;color:inherit;"><span>✅</span> Tasks</a></li>
+                <li><a href="/calendar" style="text-decoration:none;color:inherit;"><span>📅</span> Calendar</a></li>
+                <li><a href="/chat" style="text-decoration:none;color:inherit;"><span>💬</span> Team Chat</a></li>
+                <li class="active"><a href="/meeting" style="text-decoration:none;color:inherit;"><span>👥</span> Meetings</a></li>
+                <li><span>📄</span> Files/Docs</li>
+                <li><span>⚙️</span> Settings</li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Meetings</h1>
+            </div>
+
+            <div class="meetings-container">
+                <div class="filters">
+                    <select id="statusFilter">
+                        <option value="">All</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <input type="text" id="searchInput" placeholder="Search meetings...">
+                </div>
+
+                <div class="meetings-list" id="meetingsList">
+                    <!-- Meetings will be added here by JavaScript -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Meeting Details Modal -->
+    <div id="meetingDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="meetingTitle">Meeting Details</h2>
+            <div class="meeting-details-container">
+                <div class="detail-row">
+                    <label>Description:</label>
+                    <span id="meetingDescription"></span>
+                </div>
+                <div class="detail-row">
+                    <label>Date:</label>
+                    <p id="meetingDate"></p>
+                </div>
+                <div class="detail-row">
+                    <label>Status:</label>
+                    <span id="meetingStatus" class="status-badge"></span>
+                </div>
+                <div class="detail-row">
+                    <label>Link:</label>
+                    <a id="meetingLink" target="_blank"></a>
+                </div>
+                <div class="detail-row">
+                    <div class="creator-section">
+                        <label>Created by:</label>
+                        <span id="meetingCreator"></span>
+                    </div>
+                    <div class="participants-section">
+                        <label>Participants:</label>
+                        <span id="meetingParticipants"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/al.js"></script>
+    <script src="/js/meetings.js"></script>
+</body>
+</html>

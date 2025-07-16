@@ -303,46 +303,6 @@ body {
     background: #0066cc;
 }
 
-@media (max-width: 768px) {
-    .chat-input {
-        padding: 10px;
-    }
-    
-    .input-wrapper {
-        gap: 5px;
-    }
-    
-    .send-button, .attachment-btn {
-        padding: 10px;
-        min-width: 35px;
-    }
-    
-    #messageInput {
-        padding: 10px;
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 480px) {
-    .chat-input {
-        padding: 8px;
-    }
-    
-    .input-wrapper {
-        gap: 4px;
-    }
-    
-    .send-button, .attachment-btn {
-        padding: 8px;
-        min-width: 30px;
-    }
-    
-    #messageInput {
-        padding: 8px;
-        font-size: 12px;
-    }
-}
-
 .user-avatar {
     margin-bottom: 8px;
     width: 40px;

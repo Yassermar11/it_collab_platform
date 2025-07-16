@@ -10,16 +10,14 @@ const modelFiles = fs.readdirSync(__dirname)
 // Initialize models object
 const models = {};
 
-// Initialize models
-for (const file of modelFiles) {
+// Load and initialize models
+modelFiles.forEach(file => {
     const model = require(path.join(__dirname, file));
-    const modelName = model.name;
-    
-    // Initialize all models with sequelize
-    models[modelName] = model(sequelize);
-}
+    const modelName = file.replace('.js', '');
+    models[modelName] = model(sequelize, Sequelize.DataTypes);
+});
 
-// Associate models if they have associations
+// Associate models
 Object.keys(models).forEach(modelName => {
     if (models[modelName].associate) {
         models[modelName].associate(models);
@@ -28,6 +26,9 @@ Object.keys(models).forEach(modelName => {
 
 // Add models to Sequelize instance
 sequelize.models = models;
+
+// Export models
+module.exports = models;
 
 // Export models and Sequelize instance
 module.exports = {

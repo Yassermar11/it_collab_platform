@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 15 juil. 2025 à 00:37
+-- Généré le : mer. 16 juil. 2025 à 19:30
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -20,6 +20,66 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `it`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `meetings`
+--
+
+CREATE TABLE `meetings` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `start_time` datetime NOT NULL,
+  `end_time` datetime NOT NULL,
+  `status` enum('scheduled','in_progress','completed','cancelled') DEFAULT 'scheduled',
+  `creator_id` int(11) NOT NULL,
+  `invited_users` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `link` varchar(255) DEFAULT NULL,
+  `computed_status` varchar(20) DEFAULT 'scheduled'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `meetings`
+--
+
+INSERT INTO `meetings` (`id`, `title`, `description`, `start_time`, `end_time`, `status`, `creator_id`, `invited_users`, `created_at`, `updated_at`, `link`, `computed_status`) VALUES
+(1, 'Team Meeting', 'Weekly sync', '2025-07-17 17:41:10', '2025-07-17 18:41:10', 'scheduled', 1, '[2,3]', '2025-07-16 15:42:08', '2025-07-16 16:54:52', 'https://google.com', 'scheduled'),
+(2, 'Team Meeting 2', 'Weekly sync 2', '2025-07-16 17:41:10', '2025-07-16 23:41:10', 'scheduled', 1, '[2,3]', '2025-07-16 15:42:08', '2025-07-16 17:22:34', 'https://google.com', 'in_progress'),
+(3, 'Team Meeting 3', 'Weekly sync 3', '2025-07-14 17:41:10', '2025-07-14 23:41:10', 'completed', 1, '[2,3]', '2025-07-16 15:42:08', '2025-07-16 17:22:34', 'https://google.com', 'completed');
+
+--
+-- Déclencheurs `meetings`
+--
+DELIMITER $$
+CREATE TRIGGER `update_meeting_status` BEFORE INSERT ON `meetings` FOR EACH ROW BEGIN
+    SET NEW.computed_status = 
+        CASE 
+            WHEN NEW.status = 'cancelled' THEN 'cancelled'
+            WHEN CURRENT_TIMESTAMP < NEW.start_time THEN 'scheduled'
+            WHEN CURRENT_TIMESTAMP BETWEEN NEW.start_time AND NEW.end_time THEN 'in_progress'
+            WHEN CURRENT_TIMESTAMP > NEW.end_time THEN 'completed'
+            ELSE 'scheduled'
+        END;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `update_meeting_status_on_update` BEFORE UPDATE ON `meetings` FOR EACH ROW BEGIN
+    SET NEW.computed_status = 
+        CASE 
+            WHEN NEW.status = 'cancelled' THEN 'cancelled'
+            WHEN CURRENT_TIMESTAMP < NEW.start_time THEN 'scheduled'
+            WHEN CURRENT_TIMESTAMP BETWEEN NEW.start_time AND NEW.end_time THEN 'in_progress'
+            WHEN CURRENT_TIMESTAMP > NEW.end_time THEN 'completed'
+            ELSE 'scheduled'
+        END;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -43,7 +103,12 @@ CREATE TABLE `messages` (
 
 INSERT INTO `messages` (`id`, `content`, `sender_id`, `receiver_id`, `is_read`, `created_at`, `updated_at`) VALUES
 (1, 'salaaaam', 1, 3, 0, '2025-07-14 16:29:59', '2025-07-14 16:29:59'),
-(2, 'saymkom', 1, 3, 0, '2025-07-14 17:26:36', '2025-07-14 17:26:36');
+(2, 'saymkom', 1, 3, 0, '2025-07-14 17:26:36', '2025-07-14 17:26:36'),
+(3, 'erer', 1, 3, 0, '2025-07-15 01:40:44', '2025-07-15 01:40:44'),
+(4, 's', 1, 3, 0, '2025-07-15 01:49:19', '2025-07-15 01:49:19'),
+(5, 'tr', 1, 2, 0, '2025-07-15 18:02:06', '2025-07-15 18:02:06'),
+(6, 'e', 1, 3, 0, '2025-07-15 18:37:32', '2025-07-15 18:37:32'),
+(7, 'e', 1, 3, 0, '2025-07-15 18:37:36', '2025-07-15 18:37:36');
 
 -- --------------------------------------------------------
 
@@ -87,7 +152,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`session_id`, `expires`, `data`) VALUES
-('L_o60N5KueXJ47kHxbnFuEyqr1c-daWV', 1752618896, '{\"cookie\":{\"originalMaxAge\":86400000,\"expires\":\"2025-07-15T22:22:25.022Z\",\"secure\":false,\"httpOnly\":true,\"path\":\"/\"},\"userId\":1,\"username\":\"testuser\"}');
+('Wr4XObrRC-80N8Mam8-ClRDaQ53WuZF8', 1752773393, '{\"cookie\":{\"originalMaxAge\":86400000,\"expires\":\"2025-07-17T16:08:10.746Z\",\"secure\":false,\"httpOnly\":true,\"path\":\"/\"},\"userId\":1,\"username\":\"testuser\",\"role\":\"Owner\"}');
 
 -- --------------------------------------------------------
 
@@ -144,12 +209,19 @@ INSERT INTO `users` (`id`, `email`, `password`, `created_at`, `username`, `role`
 --
 
 --
+-- Index pour la table `meetings`
+--
+ALTER TABLE `meetings`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_creator` (`creator_id`);
+
+--
 -- Index pour la table `messages`
 --
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `sender_id` (`sender_id`),
-  ADD KEY `receiver_id` (`receiver_id`);
+  ADD KEY `senderId` (`sender_id`),
+  ADD KEY `receiverId` (`receiver_id`);
 
 --
 -- Index pour la table `projects`
@@ -180,16 +252,22 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT pour la table `meetings`
+--
+ALTER TABLE `meetings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT pour la table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `tasks`
@@ -206,6 +284,12 @@ ALTER TABLE `users`
 --
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `meetings`
+--
+ALTER TABLE `meetings`
+  ADD CONSTRAINT `meetings_ibfk_1` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `messages`

@@ -100,6 +100,7 @@ const socketConfig = require('./config/socket');
 const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
 const taskRoutes = require('./routes/tasks');
+const meetingsRoutes = require('./routes/meetings');
 const indexRoutes = require('./routes/index');
 
 // Mount routes
@@ -107,6 +108,7 @@ app.use('/', indexRoutes);
 app.use('/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/meetings', meetingsRoutes);
 
 socketConfig(io);
 

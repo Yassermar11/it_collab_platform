@@ -377,4 +377,8 @@ router.get('/chat', function(req, res) {
   res.sendFile('chat.html', { root: 'views' });
 });
 
+router.get('/meeting', function(req, res) {
+  res.sendFile('meetings.html', { root: 'views' });
+});
+
 module.exports = router;
